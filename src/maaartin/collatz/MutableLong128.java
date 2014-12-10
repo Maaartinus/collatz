@@ -87,16 +87,15 @@ import com.google.common.primitives.UnsignedLongs;
 
 	/** Set {@code this} to the product {@code x * (y0 + 2**64* y1)}. */
 	private void setToProduct1(long x, long y0, long y1) {
-		if (useSimplifiedMultiply) {
-			if (y1==0 && y0>=0) {
-				setToProduct1(x, y0);
-				return;
-			}
-			if (x == (int) x) {
-				setToProduct1((int) x, y0, y1);
-				return;
-			}
+		if (useSmallValues && y1==0 && y0>=0) {
+			setToProduct1(x, y0);
+			return;
 		}
+		if (useIntMultiplier && x == (int) x) {
+			setToProduct1((int) x, y0, y1);
+			return;
+		}
+
 
 		long p0 = unsignedLow(x) * unsignedLow(y0);
 		long p1 = unsignedLow(x) * unsignedHigh(y0);
@@ -238,7 +237,9 @@ import com.google.common.primitives.UnsignedLongs;
 	private static final BigInteger TWO_64 = BigInteger.ONE.shiftLeft(64);
 
 	/** Just for benchmarking. */
-	static boolean useSimplifiedMultiply = true;
+	static boolean useIntMultiplier = true;
+	/** Just for benchmarking. */
+	static boolean useSmallValues = true;
 
 	private long low;
 	private long high;

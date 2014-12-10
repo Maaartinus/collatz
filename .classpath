@@ -3,12 +3,14 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/junit"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/lombok"/>
-	<classpathentry kind="lib" path="/mg-lib/main/gson-2.3.jar"/>
-	<classpathentry kind="lib" path="/mg-lib/main/guava-18.0.jar"/>
-	<classpathentry kind="lib" path="/mg-lib/main/guice-4.0-beta4.jar"/>
-	<classpathentry kind="lib" path="/mg-lib/main/javax.inject.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fmt"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/guava"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/caliper"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lombok"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jmh"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/threetenbp"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/euler"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gson"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/guice"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/fmt"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

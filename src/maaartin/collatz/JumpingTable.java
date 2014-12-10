@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor abstract class JumpingTable {
 	static class SmallJumpingTable extends JumpingTable {
-		SmallJumpingTable(int evenSteps) {
+		private SmallJumpingTable(int evenSteps) {
 			super(evenSteps, (1 << evenSteps) - 1);
 			checkArgument(2 <= evenSteps && evenSteps <= 17);
 			data = new int[mask() + 1];
@@ -52,7 +52,7 @@ import lombok.RequiredArgsConstructor;
 	}
 
 	static class BigJumpingTable extends JumpingTable {
-		BigJumpingTable(int evenSteps) {
+		private BigJumpingTable(int evenSteps) {
 			super(evenSteps, (1 << evenSteps) - 1);
 			checkArgument(2 <= evenSteps && evenSteps <= 29);
 			data = new int[2*mask() + 2];
