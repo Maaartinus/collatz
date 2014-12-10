@@ -22,7 +22,7 @@ class MutableLong128Benchmark {
 			final int oddSteps = jumpingTable.oddSteps(random.nextInt(1 << 17));
 			xl[i] = JumpingTable.oddStepsToMultiplier(oddSteps);
 			xb[i] = BigInteger.valueOf(xl[i]);
-			ym[i] = new MutableLong128(random.nextLong(), random.nextInt(3));
+			ym[i] = new MutableLong128(random.nextLong(), random.nextBoolean() ? 0 : random.nextInt(3));
 			yb[i] = ym[i].toBigInteger();
 		}
 	}
