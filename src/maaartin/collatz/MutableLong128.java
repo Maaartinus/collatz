@@ -87,16 +87,6 @@ import com.google.common.primitives.UnsignedLongs;
 
 	/** Set {@code this} to the product {@code x * (y0 + 2**64* y1)}. */
 	private void setToProduct1(long x, long y0, long y1) {
-		if (useSmallValues && y1==0 && y0>=0) {
-			setToProduct1(x, y0);
-			return;
-		}
-		if (useIntMultiplier && x == (int) x) {
-			setToProduct1((int) x, y0, y1);
-			return;
-		}
-
-
 		long p0 = unsignedLow(x) * unsignedLow(y0);
 		long p1 = unsignedLow(x) * unsignedHigh(y0);
 		long p2 = unsignedHigh(x) * unsignedHigh(y0);
@@ -121,48 +111,6 @@ import com.google.common.primitives.UnsignedLongs;
 		p2 += unsignedHigh(p1);
 		p3 += unsignedHigh(p2);
 		high = composeLowHigh(p2, p3);
-	}
-
-	private void setToProduct1(int x, long y0, long y1) {
-		long p0 = x * unsignedLow(y0);
-		long p1 = x * unsignedHigh(y0);
-		long p2 = x * unsignedLow(y1);
-		long p3 = x * unsignedHigh(y1);
-
-		assert assertCorrectProduct1(new long[] {p0, p1, p2, p3}, x, y0, y1);
-
-		p3 += unsignedHigh(p2);
-		p2 = unsignedLow(p2) + unsignedHigh(p1);
-		p1 = unsignedLow(p1) + unsignedHigh(p0);
-		p0 = unsignedLow(p0);
-
-		assert assertCorrectProduct1(new long[] {p0, p1, p2, p3}, x, y0, y1);
-
-		low = composeLowHigh(p0, p1);
-		p2 += unsignedHigh(p1);
-		p3 += unsignedHigh(p2);
-		high = composeLowHigh(p2, p3);
-	}
-
-	private void setToProduct1(long x, long y0) {
-		long p0 = unsignedLow(x) * unsignedLow(y0);
-		long p1 = unsignedLow(x) * unsignedHigh(y0);
-		long p2 = unsignedHigh(x) * unsignedHigh(y0);
-
-		p2 += unsignedHigh(p1);
-		p1 = unsignedLow(p1) + unsignedHigh(x) * unsignedLow(y0);
-
-		assert assertCorrectProduct1(new long[] {p0, p1, p2}, x, y0, 0);
-
-		p2 += unsignedHigh(p1);
-		p1 = unsignedLow(p1) + unsignedHigh(p0);
-		p0 = unsignedLow(p0);
-
-		assert assertCorrectProduct1(new long[] {p0, p1, p2}, x, y0, 0);
-
-		low = composeLowHigh(p0, p1);
-		p2 += unsignedHigh(p1);
-		high = p2;
 	}
 
 	/** Shift {@code this} to the by 0 to 127 bits. */
@@ -235,11 +183,6 @@ import com.google.common.primitives.UnsignedLongs;
 	}
 
 	private static final BigInteger TWO_64 = BigInteger.ONE.shiftLeft(64);
-
-	/** Just for benchmarking. */
-	static boolean useIntMultiplier = true;
-	/** Just for benchmarking. */
-	static boolean useSmallValues = true;
 
 	private long low;
 	private long high;
