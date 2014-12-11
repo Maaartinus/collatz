@@ -41,7 +41,7 @@ import com.google.common.primitives.UnsignedLongs;
 		this(bigInteger.longValue(), bigInteger.shiftRight(64).longValue());
 	}
 
-	@Override protected MutableLong128 clone() {
+	@Override public MutableLong128 clone() {
 		try {
 			return (MutableLong128) super.clone();
 		} catch (final CloneNotSupportedException e) {
@@ -49,7 +49,7 @@ import com.google.common.primitives.UnsignedLongs;
 		}
 	}
 
-	void setTo(long low, long high) {
+	public void setTo(long low, long high) {
 		this.low = low;
 		this.high = high;
 	}
@@ -58,11 +58,11 @@ import com.google.common.primitives.UnsignedLongs;
 		return String.format("0x%X%016X", high, low);
 	}
 
-	boolean fitsInLong() {
+	public boolean fitsInLong() {
 		return high==0 & low>=0;
 	}
 
-	void add(long x) {
+	public void add(long x) {
 		final long old = low;
 		final long neu = old + x;
 		low = neu;
@@ -76,10 +76,10 @@ import com.google.common.primitives.UnsignedLongs;
 	}
 
 	/**
-	 * Multiply {@code this} by the argument whcih must be non-negative.
+	 * Multiply {@code this} by the argument which must be non-negative.
 	 * Overflow may or may not be detected.
 	 */
-	void multiply(long x) {
+	public void multiply(long x) {
 		checkArgument(x>=0);
 		setToProduct1(x, low, high);
 		checkOverflow();
@@ -87,34 +87,42 @@ import com.google.common.primitives.UnsignedLongs;
 
 	/** Set {@code this} to the product {@code x * (y0 + 2**64* y1)}. */
 	private void setToProduct1(long x, long y0, long y1) {
+		// The variables p0 to p3 represent the product where each of them is to be treated as an unsigned quantity.
+		// The weight of pi is 2**32 rather then 2**64.
+
 		long p0 = unsignedLow(x) * unsignedLow(y0);
 		long p1 = unsignedLow(x) * unsignedHigh(y0);
 		long p2 = unsignedHigh(x) * unsignedHigh(y0);
 
+		// Before another product can be added to p1, its higher part must be transferred to p2.
 		p2 += unsignedHigh(p1);
 		p1 = unsignedLow(p1) + unsignedHigh(x) * unsignedLow(y0);
 
+		// p3 represents the highest part and a possible overflow gets ignored.
 		long p3 = unsignedLow(x) * unsignedHigh(y1) + unsignedHigh(x) * unsignedLow(y1);
+
+		// Similarly preparing p2 to absorb another product.
 		p3 += unsignedHigh(p2);
 		p2 = unsignedLow(p2) + unsignedLow(x) * unsignedLow(y1);
 
 		assert assertCorrectProduct1(new long[] {p0, p1, p2, p3}, x, y0, y1);
 
-		p3 += unsignedHigh(p2);
-		p2 = unsignedLow(p2) + unsignedHigh(p1);
-		p1 = unsignedLow(p1) + unsignedHigh(p0);
+		// Final cleaning of upper halves.
+		p1 += unsignedHigh(p0);
 		p0 = unsignedLow(p0);
+		p2 += unsignedHigh(p1);
+		p1 = unsignedLow(p1);
+		p3 += unsignedHigh(p2);
+		p2 = unsignedLow(p2);
 
 		assert assertCorrectProduct1(new long[] {p0, p1, p2, p3}, x, y0, y1);
 
 		low = composeLowHigh(p0, p1);
-		p2 += unsignedHigh(p1);
-		p3 += unsignedHigh(p2);
 		high = composeLowHigh(p2, p3);
 	}
 
 	/** Shift {@code this} to the by 0 to 127 bits. */
-	void shiftRight(int distance) {
+	public void shiftRight(int distance) {
 		checkArgument(distance>=0 && distance<128);
 		if (distance>=64) {
 			low = high >>> distance;
@@ -125,7 +133,7 @@ import com.google.common.primitives.UnsignedLongs;
 		}
 	}
 
-	BigInteger toBigInteger() {
+	public BigInteger toBigInteger() {
 		BigInteger result = BigInteger.valueOf(low);
 		if (low<0) result = result.add(TWO_64);
 		if (high==0) return result;
@@ -178,12 +186,15 @@ import com.google.common.primitives.UnsignedLongs;
 		return x >>> 32;
 	}
 
+	/** Compose a long from two unsigned parts. The upper 32 bits of low must be zero. */
 	private static long composeLowHigh(long low, long high) {
-		return (high << 32) + (low & 0xFFFFFFFFL);
+		return (high << 32) + low;
 	}
 
 	private static final BigInteger TWO_64 = BigInteger.ONE.shiftLeft(64);
 
+	/** The lower 64 bits treated as unsigned. */
 	private long low;
+	/** The upper 64 bits (currently only 63 are usable). */
 	private long high;
 }
